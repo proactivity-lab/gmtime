@@ -59,7 +59,7 @@ static const int days[4][13] = {
 #define LEAP_CHECK(n)	((!(((n) + 1900) % 400) || (!(((n) + 1900) % 4) && (((n) + 1900) % 100))) != 0)
 #define WRAP(a,b,m)	((a) = ((a) <  0  ) ? ((b)--, (a) + (m)) : (a))
 
-time64_t pivot_time_t (const time_t * now, time64_t * _t)
+time64_t pivot_time_t (const time_t * now, const time64_t * _t)
 {
     time64_t t;
     t = *_t;
@@ -74,7 +74,7 @@ time64_t pivot_time_t (const time_t * now, time64_t * _t)
     return t;
 }
 
-static struct tm *_gmtime64_r (const time_t * now, time64_t * _t, struct tm *p)
+static struct tm *_gmtime64_r (const time_t * now, const time64_t * _t, struct tm *p)
 {
     int v_tm_sec, v_tm_min, v_tm_hour, v_tm_mon, v_tm_wday, v_tm_tday;
     int leap;
