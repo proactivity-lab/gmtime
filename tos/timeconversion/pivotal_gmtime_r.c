@@ -41,11 +41,13 @@ const char pivotal_gmtime_r_stamp[] =
 
 /* DOCUMENTATION: See http://2038bug.com/pivotal_gmtime_doc.html */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
+//#include <stdlib.h>
+//#include <stdio.h>
+//#include <time.h>
 
-typedef long long time64_t;
+//typedef long long time64_t;
+
+#include "time64.h"
 
 static const int days[4][13] = {
     {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
@@ -77,7 +79,7 @@ static struct tm *_gmtime64_r (const time_t * now, time64_t * _t, struct tm *p)
     int v_tm_sec, v_tm_min, v_tm_hour, v_tm_mon, v_tm_wday, v_tm_tday;
     int leap;
     time64_t t;
-    long m;
+    int32_t m;
     t = pivot_time_t (now, _t);
     v_tm_sec = ((time64_t) t % (time64_t) 60);
     t /= 60;
@@ -91,34 +93,34 @@ static struct tm *_gmtime64_r (const time_t * now, time64_t * _t, struct tm *p)
     WRAP (v_tm_hour, v_tm_tday, 24);
     if ((v_tm_wday = (v_tm_tday + 4) % 7) < 0)
         v_tm_wday += 7;
-    m = (long) v_tm_tday;
+    m = (int32_t) v_tm_tday;
     if (m >= 0) {
         p->tm_year = 70;
         leap = LEAP_CHECK (p->tm_year);
-        while (m >= (long) days[leap + 2][12]) {
-            m -= (long) days[leap + 2][12];
+        while (m >= (int32_t) days[leap + 2][12]) {
+            m -= (int32_t) days[leap + 2][12];
             p->tm_year++;
             leap = LEAP_CHECK (p->tm_year);
         }
         v_tm_mon = 0;
-        while (m >= (long) days[leap][v_tm_mon]) {
-            m -= (long) days[leap][v_tm_mon];
+        while (m >= (int32_t) days[leap][v_tm_mon]) {
+            m -= (int32_t) days[leap][v_tm_mon];
             v_tm_mon++;
         }
     } else {
         p->tm_year = 69;
         leap = LEAP_CHECK (p->tm_year);
-        while (m < (long) -days[leap + 2][12]) {
-            m += (long) days[leap + 2][12];
+        while (m < (int32_t) -days[leap + 2][12]) {
+            m += (int32_t) days[leap + 2][12];
             p->tm_year--;
             leap = LEAP_CHECK (p->tm_year);
         }
         v_tm_mon = 11;
-        while (m < (long) -days[leap][v_tm_mon]) {
-            m += (long) days[leap][v_tm_mon];
+        while (m < (int32_t) -days[leap][v_tm_mon]) {
+            m += (int32_t) days[leap][v_tm_mon];
             v_tm_mon--;
         }
-        m += (long) days[leap][v_tm_mon];
+        m += (int32_t) days[leap][v_tm_mon];
     }
     p->tm_mday = (int) m + 1;
     p->tm_yday = days[leap + 2][v_tm_mon] + m;
@@ -143,7 +145,7 @@ struct tm *pivotal_gmtime_r (const time_t * now, const time_t * _t, struct tm *p
 time64_t mktime64 (struct tm * t)
 {
     int i, y;
-    long day = 0;
+    int32_t day = 0;
     time64_t r;
     if (t->tm_year < 70) {
         y = 69;
@@ -162,13 +164,13 @@ time64_t mktime64 (struct tm * t)
         day += days[LEAP_CHECK (t->tm_year)][i];
     day += t->tm_mday - 1;
     t->tm_wday = (int) ((day + 4) % 7);
-    r = (time64_t) day *86400;
-    r += t->tm_hour * 3600;
-    r += t->tm_min * 60;
+    r = (time64_t)day * 86400L;
+    r += t->tm_hour * 3600L;
+    r += t->tm_min * 60L;
     r += t->tm_sec;
     return r;
 }
-
+/*
 static struct tm *_localtime64_r (const time_t * now, time64_t * _t, struct tm *p)
 {
     time64_t tl;
@@ -200,3 +202,4 @@ struct tm *localtime64_r (const time64_t * _t, struct tm *p)
     tl = *_t;
     return _localtime64_r (NULL, &tl, p);
 }
+*/
