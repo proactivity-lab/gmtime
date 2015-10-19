@@ -76,8 +76,8 @@ time64_t pivot_time_t (const time_t * now, const time64_t * _t)
 
 static struct tm *_gmtime64_r (const time_t * now, const time64_t * _t, struct tm *p)
 {
-    int v_tm_sec, v_tm_min, v_tm_hour, v_tm_mon, v_tm_wday, v_tm_tday;
-    int leap;
+    int32_t v_tm_sec, v_tm_min, v_tm_hour, v_tm_mon, v_tm_wday, v_tm_tday;
+    int32_t leap;
     time64_t t;
     int32_t m;
     t = pivot_time_t (now, _t);
@@ -144,7 +144,7 @@ struct tm *pivotal_gmtime_r (const time_t * now, const time_t * _t, struct tm *p
 
 time64_t mktime64 (struct tm * t)
 {
-    int i, y;
+    int32_t i, y;
     int32_t day = 0;
     time64_t r;
     if (t->tm_year < 70) {
@@ -163,7 +163,7 @@ time64_t mktime64 (struct tm * t)
     for (i = 0; i < t->tm_mon; i++)
         day += days[LEAP_CHECK (t->tm_year)][i];
     day += t->tm_mday - 1;
-    t->tm_wday = (int) ((day + 4) % 7);
+    t->tm_wday = (uint8_t)((day + 4) % 7);
     r = (time64_t)day * 86400L;
     r += t->tm_hour * 3600L;
     r += t->tm_min * 60L;
