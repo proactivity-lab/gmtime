@@ -130,8 +130,13 @@ static struct tm *_gmtime64_r (const time_t * now, const time64_t * _t, struct t
 
 struct tm *gmtime64_r (const time64_t * _t, struct tm *p)
 {
-    time64_t t;
-    t = *_t;
+    time64_t t = *_t;
+    if(t > 253402300799LL) { // 9999-12-31 23:59:59
+        return NULL;
+    }
+    if(t < -2208988800LL) { // 1900-01-01 00:00:00
+        return NULL;
+    }
     return _gmtime64_r (NULL, &t, p);
 }
 
@@ -144,32 +149,40 @@ struct tm *pivotal_gmtime_r (const time_t * now, const time_t * _t, struct tm *p
 
 time64_t mktime64 (struct tm * t)
 {
-    int32_t i, y;
-    int32_t day = 0;
     time64_t r;
-    if (t->tm_year < 70) {
-        y = 69;
-        do {
-            day -= 365 + LEAP_CHECK (y);
-            y--;
-        } while (y >= t->tm_year);
-    } else {
-        y = 70;
-        while (y < t->tm_year) {
-            day += 365 + LEAP_CHECK (y);
-            y++;
-        }
+    if(t->tm_year > (9999-1900))
+    {
+        r = INT64_MAX;
     }
-    for (i = 0; i < t->tm_mon; i++)
-        day += days[LEAP_CHECK (t->tm_year)][i];
-    day += t->tm_mday - 1;
-    t->tm_wday = (uint8_t)((day + 4) % 7);
-    r = (time64_t)day * 86400L;
-    r += t->tm_hour * 3600L;
-    r += t->tm_min * 60L;
-    r += t->tm_sec;
+    else
+    {
+        int32_t i, y;
+        int32_t day = 0;
+        if (t->tm_year < 70) {
+            y = 69;
+            do {
+                day -= 365 + LEAP_CHECK (y);
+                y--;
+            } while (y >= t->tm_year);
+        } else {
+            y = 70;
+            while (y < t->tm_year) {
+                day += 365 + LEAP_CHECK (y);
+                y++;
+            }
+        }
+        for (i = 0; i < t->tm_mon; i++)
+            day += days[LEAP_CHECK (t->tm_year)][i];
+        day += t->tm_mday - 1;
+        t->tm_wday = (uint8_t)((day + 4) % 7);
+        r = (time64_t)day * 86400L;
+        r += t->tm_hour * 3600L;
+        r += t->tm_min * 60L;
+        r += t->tm_sec;
+    }
     return r;
 }
+
 /*
 static struct tm *_localtime64_r (const time_t * now, time64_t * _t, struct tm *p)
 {

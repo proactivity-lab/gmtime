@@ -12,14 +12,14 @@ implementation {
 
 	#include "pivotal_gmtime_r.c" // Include all the code into this module
 
-	//time64_t mktime64 (struct tm * t)
+	// time64_t mktime64 (struct tm * t)
 	time64_t mktime(struct tm* t) @C() {
 		return mktime64(t);
 	}
 
-	//struct tm *_gmtime64_r (const time_t * now, time64_t * _t, struct tm *p)
+	// struct tm *gmtime64_r (const time64_t * _t, struct tm *p)
 	struct tm* gmtime_r(const time64_t* timep, struct tm* result) @C() {
-		return _gmtime64_r(NULL, timep, result);
+		return gmtime64_r(timep, result);
 	}
 
 }
