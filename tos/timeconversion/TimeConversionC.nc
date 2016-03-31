@@ -22,4 +22,9 @@ implementation {
 		return gmtime64_r(timep, result);
 	}
 
+	struct tm* tm_add_seconds(struct tm* tm, time64_t seconds) @C() {
+		time64_t t = mktime(tm) + seconds;
+		return gmtime_r(&t, tm);
+	}
+
 }
