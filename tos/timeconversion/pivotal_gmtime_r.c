@@ -49,7 +49,11 @@ const char pivotal_gmtime_r_stamp[] =
 
 #include "time64.h"
 
+#ifdef TOSSIM // Cannot use const for TOSSIM, because array gets initialized with memcpy
+static int days[4][13] = {
+#else
 static const int days[4][13] = {
+#endif // TOSSIM
     {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
     {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
     {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365},
